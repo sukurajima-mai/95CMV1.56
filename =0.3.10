@@ -1,0 +1,11 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting pytesseract
+  Downloading pytesseract-0.3.13-py3-none-any.whl.metadata (11 kB)
+Collecting packaging>=21.3 (from pytesseract)
+  Using cached packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
+Requirement already satisfied: Pillow>=8.0.0 in c:\users\程逸雷\appdata\roaming\python\python314\site-packages (from pytesseract) (12.1.1)
+Downloading pytesseract-0.3.13-py3-none-any.whl (14 kB)
+Using cached packaging-26.0-py3-none-any.whl (74 kB)
+Installing collected packages: packaging, pytesseract
+
+Successfully installed packaging-26.0 pytesseract-0.3.13
