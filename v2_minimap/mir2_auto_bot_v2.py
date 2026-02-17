@@ -394,6 +394,27 @@ class Mir2AutoBotV2:
                     f"黄点检测: {self.stats['yellow_dots_detected']} | "
                     f"使用传送: {self.stats['teleports_used']}"
                 )
+                
+                # 每15分钟清理一次debug目录
+                if int(elapsed) % 900 == 0:  # 900秒 = 15分钟
+                    self._cleanup_debug_dir()
+
+    def _cleanup_debug_dir(self):
+        """清理debug目录"""
+        debug_dir = os.path.join(SCRIPT_DIR, 'debug')
+        if not os.path.exists(debug_dir):
+            return
+        
+        try:
+            # 获取目录下所有文件
+            files = [f for f in os.listdir(debug_dir) if f.endswith(('.jpg', '.png', '.bmp'))]
+            if files:
+                for file in files:
+                    file_path = os.path.join(debug_dir, file)
+                    os.remove(file_path)
+                logger.info(f"已清理debug目录: 删除 {len(files)} 个调试图片")
+        except Exception as e:
+            logger.warning(f"清理debug目录失败: {e}")
 
     def run(self):
         """运行挂机脚本"""

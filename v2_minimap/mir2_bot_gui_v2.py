@@ -934,7 +934,34 @@ class BotGUI:
         """更新统计循环"""
         if self.bot and self.bot.running:
             self.update_stats()
+            
+            # 每15分钟清理一次debug目录
+            if self.bot.stats['start_time']:
+                elapsed = (datetime.now() - self.bot.stats['start_time']).total_seconds()
+                if int(elapsed) > 0 and int(elapsed) % 900 == 0:  # 900秒 = 15分钟
+                    self._cleanup_debug_dir()
+            
             self.root.after(1000, self._update_stats_loop)
+    
+    def _cleanup_debug_dir(self):
+        """清理debug目录"""
+        debug_dir = os.path.join(SCRIPT_DIR, 'debug')
+        if not os.path.exists(debug_dir):
+            return
+        
+        try:
+            # 获取目录下所有文件
+            files = [f for f in os.listdir(debug_dir) if f.endswith(('.jpg', '.png', '.bmp'))]
+            if files:
+                for file in files:
+                    file_path = os.path.join(debug_dir, file)
+                    try:
+                        os.remove(file_path)
+                    except:
+                        pass
+                self.log(f"Cleaned debug directory: {len(files)} files removed")
+        except Exception as e:
+            self.log(f"Failed to clean debug directory: {e}", "WARNING")
 
     def run(self):
         """运行界面"""

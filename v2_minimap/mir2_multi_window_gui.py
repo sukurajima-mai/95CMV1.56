@@ -525,6 +525,7 @@ class MultiWindowBotGUI:
 
         self.log(f"Starting monitoring {enabled_count} window(s) (independent threads)...")
         self.running = True
+        self.start_time = datetime.now()  # 记录启动时间
 
         # 更新配置
         self.config.set('Teleport', 'teleport_key', self.teleport_key_var.get())
@@ -563,7 +564,34 @@ class MultiWindowBotGUI:
         if self.running:
             self.update_stats()
             self.refresh_window_list()
+            
+            # 每15分钟清理一次debug目录
+            if hasattr(self, 'start_time') and self.start_time:
+                elapsed = (datetime.now() - self.start_time).total_seconds()
+                if int(elapsed) > 0 and int(elapsed) % 900 == 0:  # 900秒 = 15分钟
+                    self._cleanup_debug_dir()
+            
             self.root.after(1000, self._update_stats_loop)
+    
+    def _cleanup_debug_dir(self):
+        """清理debug目录"""
+        debug_dir = os.path.join(SCRIPT_DIR, 'debug')
+        if not os.path.exists(debug_dir):
+            return
+        
+        try:
+            # 获取目录下所有文件
+            files = [f for f in os.listdir(debug_dir) if f.endswith(('.jpg', '.png', '.bmp'))]
+            if files:
+                for file in files:
+                    file_path = os.path.join(debug_dir, file)
+                    try:
+                        os.remove(file_path)
+                    except:
+                        pass
+                self.log(f"Cleaned debug directory: {len(files)} files removed")
+        except Exception as e:
+            self.log(f"Failed to clean debug directory: {e}", "WARNING")
 
     def update_stats(self):
         """更新统计显示"""
